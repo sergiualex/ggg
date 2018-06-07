@@ -78,9 +78,11 @@
   <ItemGroup>
     <ClCompile Include="battleship.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="webservice.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battleship.h" />
+    <ClInclude Include="webservice.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="battleship.log" />

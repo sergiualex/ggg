@@ -1,11 +1,11 @@
 /*==============================================================================
- | Filename: battleship.h                                                    
- | Programmer: Gabriel V. de a Cruz Jr.                                  
- | Class: CptS 121, Fall 2012 ; Lab Section 7                            
- | Programming Assignment 4: Basic Game of Battleship                    
- | Date: October 17, 2012                                                 
- +------------------------------------------------------------------------------                                                                       
- | Description: The file contains all of the function prototypee, structs, 
+ | Filename: battleship.h
+ | Programmer: Gabriel V. de a Cruz Jr.
+ | Class: CptS 121, Fall 2012 ; Lab Section 7
+ | Programming Assignment 4: Basic Game of Battleship
+ | Date: October 17, 2012
+ +------------------------------------------------------------------------------
+ | Description: The file contains all of the function prototypee, structs,
  |              enumerated types, constanct macros and standard libraries,
  |              required to run the game of Battleship.
  ==============================================================================*/
@@ -54,40 +54,40 @@
 /* ENUMERATED TYPES */
 
 typedef enum {
-	FALSE, TRUE
+  FALSE, TRUE
 } Boolean;
 
 typedef enum {
-	CARRIER_L    = 5, 
-	BATTLESHIP_L = 4,
-	CRUISER_L    = 3, 
-	SUBMARINE_L  = 3,
-	DESTROYER_L  = 2
+    CARRIER_L    = 5,
+    BATTLESHIP_L = 4,
+    CRUISER_L    = 3,
+    SUBMARINE_L  = 3,
+    DESTROYER_L  = 2
 } ShipType;
 
 /* STRUCT TYPES */
 
 typedef struct watercraft {
-	char   symbol;
-	short  length;
-	char   *name;
+    char   symbol;
+    short  length;
+    char   *name;
 } WaterCraft;
 
 typedef struct stats {
-	int        numHits;
-	int        numMisses;
-	int        totalShots;
-	double     hitMissRatio;
+    int        numHits;
+    int        numMisses;
+    int        totalShots;
+    double     hitMissRatio;
 } Stats;
 
 typedef struct coordinate {
-	int        row;
-	int        column;
+    int        row;
+    int        column;
 } Coordinate;
 
 typedef struct cell {
-	char       symbol; 
-	Coordinate position;
+    char       symbol;
+    Coordinate position;
 } Cell;
 
 /* FUNCTION PROTOTYPES */

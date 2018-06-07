@@ -18,6 +18,8 @@
  ==============================================================================*/
 
 #include "battleship.h"
+#include "webservice.h"
+
 
 int main (void)
 {

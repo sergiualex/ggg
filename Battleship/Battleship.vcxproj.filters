@@ -21,9 +21,15 @@
     <ClCompile Include="battleship.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="webservice.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="battleship.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="webservice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
