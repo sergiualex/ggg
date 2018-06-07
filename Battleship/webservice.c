@@ -73,7 +73,7 @@ CALL( WSAStartup(MAKEWORD(2,2), &wsa) == 0 );
 struct servent *sent;
 CALL( (sent = getservbyname("http", "tcp")) != NULL );
 //int port = sent -> s_port;
-int port = 25335;
+int port = 63330;//25335;
 
 struct protoent *pent;
 CALL( (pent = getprotobyname("tcp")) != NULL );
@@ -86,7 +86,11 @@ printf("%s -> %s\n", hent->h_name, inet_ntoa(*((struct in_addr *)hent->h_addr)))
 struct sockaddr_in addr;
 addr.sin_family = AF_INET;
 addr.sin_port = port;
-addr.sin_addr = *((struct in_addr *) hent->h_addr);
+//addr.sin_addr = *((struct in_addr *) hent->h_addr);
+addr.sin_addr.S_un.S_un_b.s_b1 = 172;
+addr.sin_addr.S_un.S_un_b.s_b2 = 17;
+addr.sin_addr.S_un.S_un_b.s_b3 = 53;
+addr.sin_addr.S_un.S_un_b.s_b4 = 251;
 memset(addr.sin_zero, 0, 8);
 
 int sock;
