@@ -722,6 +722,8 @@ int getRandomNumber (int lowest, int highest) {
 
     if (lowest > 0)
         return rand () % highest + lowest;
+
+    return 0;
 }
 
 void huntCoordinates(Coordinate *target)
@@ -736,4 +738,9 @@ void huntCoordinates(Coordinate *target)
 void calculateNextShot(Coordinate *target)
 {
 
+}
+
+Boolean checkIfShotDown()
+{
+    return FALSE;
 }

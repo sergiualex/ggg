@@ -19,6 +19,11 @@
 
 #include "battleship.h"
 #include "webservice.h"
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 
 
 int main (void)
@@ -26,9 +31,9 @@ int main (void)
     int state = 0;
     Cell adversaryGameBoard[ROWS][COLS];       /* Adversary game board */
     Coordinate target;             /* x, y value of a target */
-    Coordinate targetTemp;         /* x, y value that holds a temporary value*/
-    Coordinate targetOrigin;       /* x, y value of the original target */
-    Coordinate targetAI;           /* x, y value of the targets using AI technique */
+    //Coordinate targetTemp;         /* x, y value that holds a temporary value*/
+    //Coordinate targetOrigin;       /* x, y value of the original target */
+    //Coordinate targetAI;           /* x, y value of the targets using AI technique */
 
     Boolean my_turn = FALSE;                     /*is it my turn or not?*/
     Boolean huntMode = TRUE;                     /* mode of randomly selecting a target */
@@ -43,7 +48,7 @@ int main (void)
 
     do
         {
-        get_game_info();
+        get_input();
         switch (state)
             {
             case 0:
@@ -78,15 +83,25 @@ int main (void)
                             } while (shot == -1);
                         }
 
+                    /* Send shot to server */
                     take_shot(target.row, target.column);
+
+                    /* Update board with result of shot */
                     if (hit)
-                        adversaryGameBoard[target.row][target.column].symbol == HIT;
+                        adversaryGameBoard[target.row][target.column].symbol = HIT;
                     else
-                        adversaryGameBoard[target.row][target.column].symbol == MISS;
+                        adversaryGameBoard[target.row][target.column].symbol = MISS;
+
+                    /* if shot down switch to hunt mode.*/
+                    if (checkIfShotDown())
+                        {
+                        targetMode = FALSE;
+                        huntMode = TRUE;
+                        }
                     }
             }
-        sleep(1);   /*wait 1 second*/
-        } while ( state <= 4)
+        Sleep(1000);   /*wait 1 second*/
+        } while (state <= 4);
 
     ///**
     // * Two boards exist within the game. Hint: each board should be

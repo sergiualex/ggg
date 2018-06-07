@@ -6,7 +6,6 @@
 
 #include <stdio.h> /* printf, sprintf */
 #include <Winsock2.h> /* socket, connect */
-//#include <Windows.h>
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -173,10 +172,10 @@ closesocket(sock);
 /*********************************************************************
 *
 *   PROCEDURE NAME:
-*       get_bot_ID
+*       set_board
 *
 *   DESCRIPTION:
-*       Makes a GET request to the server to get the bot ID
+*       Sends the our board info to server
 *
 *********************************************************************/
 void set_board
@@ -208,4 +207,21 @@ void set_board
         }
 
     /* TODO: send battle plan */
+}
+
+/*********************************************************************
+*
+*   PROCEDURE NAME:
+*       get_input
+*
+*   DESCRIPTION:
+*       Obtains input from server
+*
+*********************************************************************/
+void get_input
+    (
+    void
+    )
+{
+    /* TODO: get input from server*/
 }

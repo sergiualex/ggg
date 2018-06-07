@@ -49,6 +49,11 @@ void get_bot_ID
     void
     );
 
+void get_input
+    (
+    void
+    );
+
 void set_board
     (
     void

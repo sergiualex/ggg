@@ -25,34 +25,25 @@
 #define ROWS 10
 #define COLS 10
 
-#define LOG_FILE_NAME "battleplanes.log"
+#define NUM_OF_PLANES   3
 
-#define NUM_OF_PLANES 3
+#define AIR            '?'
+#define HIT            'x'
+#define MISS           '1'
 
-#define HORIZONTAL    0
-#define VERTICAL      1
+#define PLANE          'p'
 
-#define PLAYER_ONE    0
-#define PLAYER_TWO    1
-
-
-#define AIR           '?'
-#define HIT           'x'
-#define MISS          ' '
-
-#define PLANE         'p'
-
-#define SOUTH 1
-#define WEST  2
-#define NORTH 3
-#define EAST  4
+#define SOUTH           1
+#define WEST            2
+#define NORTH           3
+#define EAST            4
 
 #define PLANE_LENGTH    4
 #define WING_LENGTH     2
 
 /* ENUMERATED TYPES */
 
-typedef enum {
+typedef enum boolean {
     FALSE, TRUE
 } Boolean;
 
@@ -95,6 +86,7 @@ void         systemMessage                  (char *message);
 void         huntCoordinates                (Coordinate *target);
 void         calculateNextShot              (Coordinate *target);
 
+Boolean      checkIfShotDown                (void);
 Boolean      checkSunkShip                  (short sunkShip[][NUM_OF_PLANES], short player, char shipSymbol, FILE *stream);
 Boolean      isValidLocation                (Cell gameBoard[][COLS], Coordinate position, int direction);
 Boolean      convertStringtoPosition        (Coordinate *position, char *stringPosition, int *direction_of_flight);
