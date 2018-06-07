@@ -35,7 +35,7 @@ int main (void)
     //Coordinate targetOrigin;       /* x, y value of the original target */
     //Coordinate targetAI;           /* x, y value of the targets using AI technique */
 
-    Boolean my_turn = FALSE;                     /*is it my turn or not?*/
+    int yourTurn = 0;                     /*is it my turn or not?*/
     Boolean huntMode = TRUE;                     /* mode of randomly selecting a target */
     Boolean targetMode     = FALSE;              /* mode when there is a hit */
     Boolean hit = FALSE;   /* target was hit or miss*/
@@ -48,7 +48,7 @@ int main (void)
 
     do
         {
-        get_input();
+        state = get_input( &yourTurn );
         switch (state)
             {
             case 0:
@@ -58,10 +58,39 @@ int main (void)
             case 2:
                 break;
             case 3:
-                set_board();
+            {
+                Coordinate position;
+                int direction_of_flight = -1;
+                int i = 0;
+                int battlePlan[3][3];
+                memset(&battlePlan, 0, sizeof(battlePlan));
+                Cell gameBoard[ROWS][COLS];
+                initializeGameBoard(gameBoard);
+
+                for (i = 0; i < NUM_OF_PLANES; i++)
+                {
+                    while (TRUE)
+                    {
+                        direction_of_flight = getRandomNumber(1, 3); /*  1 -> SOUTH
+                                                                          2 -> WEST
+                                                                          3 -> NORTH
+                                                                          4 -> EAST */
+                        position = generatePosition(direction_of_flight);
+
+                        if (isValidLocation(gameBoard, position, direction_of_flight))
+                            break;
+                    }
+                    battlePlan[i][0] = position.row;
+                    battlePlan[i][1] = position.column;
+                    battlePlan[i][2] = direction_of_flight;
+                    putShipOnGameBoard(gameBoard, position, direction_of_flight);
+                }
+                set_board(battlePlan);
+                break;
+            }
             case 4:
 
-                if (my_turn)
+                if (yourTurn)
                     {
                     if (huntMode)
                         {
@@ -77,18 +106,22 @@ int main (void)
                         {
                         do
                             {
-                            calculateNextShot(&target);
+                            calculateNextShot(adversaryGameBoard, &target);
                             shot = checkShot(adversaryGameBoard, target);
 
                             } while (shot == -1);
                         }
 
                     /* Send shot to server */
-                    take_shot(target.row, target.column);
+                    int hit = take_shot(target.row, target.column);
 
                     /* Update board with result of shot */
-                    if (hit)
+                    if (hit == 1)
+                    {
                         adversaryGameBoard[target.row][target.column].symbol = HIT;
+                        targetMode = TRUE;
+                        huntMode = FALSE;
+                    }
                     else
                         adversaryGameBoard[target.row][target.column].symbol = MISS;
 
@@ -100,7 +133,7 @@ int main (void)
                         }
                     }
             }
-        Sleep(1000);   /*wait 1 second*/
+        //Sleep(1000);   /*wait 1 second*/
         } while (state <= 4);
 
     ///**

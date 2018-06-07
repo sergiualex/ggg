@@ -44,22 +44,17 @@ Clears structure variable (pointed to by p_var) to 0.
 /*----------------------------------------------------------
 webservice.c
 ----------------------------------------------------------*/
-void get_bot_ID
+int get_input
     (
-    void
-    );
-
-void get_input
-    (
-    void
+    int *yourTurn
     );
 
 void set_board
     (
-    void
+    int battlePlan[3][3]
     );
 
-void take_shot
+int take_shot
     (
     int x,
     int y
