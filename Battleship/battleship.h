@@ -25,9 +25,9 @@
 #define ROWS 10
 #define COLS 10
 
-#define LOG_FILE_NAME "battleship.log"
+#define LOG_FILE_NAME "battleplanes.log"
 
-#define NUM_OF_SHIPS  5
+#define NUM_OF_PLANES 3
 
 #define HORIZONTAL    0
 #define VERTICAL      1
@@ -36,42 +36,33 @@
 #define PLAYER_TWO    1
 
 
-#define WATER         '~'
+#define AIR           ' '
 #define HIT           '*'
-#define MISS          'm'
+#define MISS          'X'
 
-#define CARRIER       'c'
-#define BATTLESHIP    'b'
-#define CRUISER       'r'
-#define SUBMARINE     's'
-#define DESTROYER     'd'
+#define PLANE         'p'
 
-#define NORTH 0
 #define SOUTH 1
 #define WEST  2
-#define EAST  3
+#define NORTH 3
+#define EAST  4
+
+#define PLANE_LENGTH    4
+#define WING_LENGTH     2
 
 /* ENUMERATED TYPES */
 
 typedef enum {
-  FALSE, TRUE
+    FALSE, TRUE
 } Boolean;
-
-typedef enum {
-    CARRIER_L    = 5,
-    BATTLESHIP_L = 4,
-    CRUISER_L    = 3,
-    SUBMARINE_L  = 3,
-    DESTROYER_L  = 2
-} ShipType;
 
 /* STRUCT TYPES */
 
-typedef struct watercraft {
+typedef struct aircraft {
     char   symbol;
     short  length;
     char   *name;
-} WaterCraft;
+} AirCraft;
 
 typedef struct stats {
     int        numHits;
@@ -94,19 +85,19 @@ typedef struct cell {
 
 void         welcomeScreen                  (void);
 void         initializeGameBoard            (Cell gameBoard[][COLS]);
-void         printGameBoard                 (Cell gameBoard [][COLS], Boolean showPegs);
-void         putShipOnGameBoard             (Cell gameBoard[][COLS], WaterCraft ship, Coordinate position, int direction);
-void         manuallyPlaceShipsOnGameBoard  (Cell gameBoard[][COLS], WaterCraft ship[]);
-void         randomlyPlaceShipsOnGameBoard  (Cell gameBoard[][COLS], WaterCraft ship[]);
+void         printGameBoard                 (Cell gameBoard[][COLS], Boolean showPegs);
+void         putShipOnGameBoard             (Cell gameBoard[][COLS], Coordinate position, int direction_of_flight);
+void         manuallyPlaceShipsOnGameBoard  (Cell gameBoard[][COLS], AirCraft ship[]);
+void         randomlyPlaceShipsOnGameBoard  (Cell gameBoard[][COLS], AirCraft ship[]);
 void         updateGameBoard                (Cell gameBoard[][COLS], Coordinate target);
 void         checkBoundsOfCardinal          (Boolean cardinals[], int bound, int direction);
 void         systemMessage                  (char *message);
 
-Boolean      checkSunkShip                  (short sunkShip[][NUM_OF_SHIPS], short player, char shipSymbol, FILE *stream);
-Boolean      isValidLocation                (Cell gameBoard[][COLS], Coordinate position, int direction, int length);
-Boolean      convertStringtoPosition        (Coordinate position[], char *stringPosition, int length);
+Boolean      checkSunkShip                  (short sunkShip[][NUM_OF_PLANES], short player, char shipSymbol, FILE *stream);
+Boolean      isValidLocation                (Cell gameBoard[][COLS], Coordinate position, int direction);
+Boolean      convertStringtoPosition        (Coordinate *position, char *stringPosition, int *direction_of_flight);
 Boolean      isWinner                       (Stats players[], int player);
-Coordinate   generatePosition               (int direction, int length);
+Coordinate   generatePosition               (int direction);
 Coordinate   getTarget                      (void);
 
 short        checkShot                      (Cell gameBoard[][COLS], Coordinate target);

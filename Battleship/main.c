@@ -39,11 +39,7 @@ int main (void)
     Coordinate targetOrigin;       /* x, y value of the original target */
     Coordinate targetAI;           /* x, y value of the targets using AI technique */
 
-    WaterCraft ship[NUM_OF_SHIPS] = {{'c', 5, "Carrier"},
-                                     {'b', 4, "Battleship"},
-                                     {'r', 3, "Cruiser"},
-                                     {'s', 3, "Submarine"},
-                                     {'d', 2, "Destroyer"}};
+    AirCraft ship[NUM_OF_PLANES] = { {'p', 4, "Plane" } };
 
     Boolean    huntMode       = TRUE;                     /* mode of randomly selecting a target */
     Boolean    targetMode     = FALSE;                    /* mode when there is a hit */
@@ -52,8 +48,8 @@ int main (void)
     Boolean    hasAShipSunked = FALSE;                    /* if a ship has sank */
 
 
-    short sunkShip[2][NUM_OF_SHIPS] = {{5, 4, 3, 3, 2},
-                                       {5, 4, 3, 3, 2}};  /* tracks parts of the ship destroyed */
+    short sunkPlane[2][NUM_OF_PLANES] = {{4, 4, 4},
+                                       {4, 4, 4}};  /* tracks parts of the ship destroyed */
 
     short player  = 0;             /* 0 -> player1, 1 -> player2 */
     short shot    = 0;             /* holds temp value if ship has been shot */
@@ -70,7 +66,7 @@ int main (void)
     FILE *outStream = NULL;        /* stream to output file battleship.log */
 
     /* Start of Program */
-    fopen_s(&outStream, LOG_FILE_NAME, "w");
+    fopen_s( &outStream, LOG_FILE_NAME, "w" );
 
     srand ((unsigned int) time (NULL));
 
@@ -443,9 +439,9 @@ int main (void)
 
             /* Checks if the ship has sank */
             if (player == 1)
-                hasAShipSunked = checkSunkShip (sunkShip, !player, shipSymbol, outStream);
+                hasAShipSunked = checkSunkShip (sunkPlane, !player, shipSymbol, outStream);
             else
-                checkSunkShip (sunkShip, !player, shipSymbol, outStream);
+                checkSunkShip (sunkPlane, !player, shipSymbol, outStream);
 
         } else {        /* MISS */
             printf ("> %d, %d is a miss!\n", target.row, target.column);

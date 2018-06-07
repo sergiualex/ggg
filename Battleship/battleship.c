@@ -54,7 +54,7 @@ void initializeGameBoard (Cell gameBoard[][COLS]) {
 
     for (i = 0; i < ROWS; i++)
         for (j = 0; j < COLS; j++) {
-            gameBoard[i][j].symbol          = WATER;
+            gameBoard[i][j].symbol          = AIR;
             gameBoard[i][j].position.row    = i;
             gameBoard[i][j].position.column = j;
         }
@@ -85,8 +85,8 @@ void printGameBoard (Cell gameBoard [][COLS], Boolean showPegs) {
                 switch (gameBoard [i][j].symbol) {
                     case HIT:   printf ("%c ", HIT);   break;
                     case MISS:  printf ("%c ", MISS);  break;
-                    case WATER:
-                    default:    printf ("%c ", WATER); break;
+                    case AIR:
+                    default:    printf ("%c ", AIR); break;
                 }
             }
         }
@@ -104,16 +104,76 @@ void printGameBoard (Cell gameBoard [][COLS], Boolean showPegs) {
  * Pre-condition : n/a
  * Post-condition: Specific type of ship place on specificied target cell
  */
-void putShipOnGameBoard (Cell gameBoard[][COLS], WaterCraft ship,
-                         Coordinate position, int direction) {
-    int i = ship.length - 1;
-
-    for (i = 0; i < ship.length; i++) {
-        if (direction == HORIZONTAL)
-            gameBoard [position.row][position.column + i].symbol = ship.symbol;
-        else /* VERTICAL */
-            gameBoard [position.row + i][position.column].symbol = ship.symbol;
-    }
+void putShipOnGameBoard (Cell gameBoard[][COLS], Coordinate position, int direction_of_flight)
+{
+    int j;
+    switch (direction_of_flight)
+        {
+        case NORTH:
+            /* Add the body */
+            for (j = 0; j < PLANE_LENGTH; j++)
+                {
+                gameBoard[position.row + j][position.column].symbol = PLANE;
+                }
+            /* Add the wings */
+            for (j = 1; j < WING_LENGTH + 1; j++)
+                {
+                gameBoard[position.row + 1][position.column - j].symbol = PLANE;
+                gameBoard[position.row + 1][position.column + j].symbol = PLANE;
+                }
+            /* Add the tail */
+            gameBoard[position.row + PLANE_LENGTH - 1][position.column + 1].symbol = PLANE;
+            gameBoard[position.row + PLANE_LENGTH - 1][position.column - 1].symbol = PLANE;
+            break;
+        case SOUTH:
+            /* Add the body */
+            for (j = 0; j < PLANE_LENGTH; j++)
+                {
+                gameBoard[position.row - j][position.column].symbol = PLANE;
+                }
+            /* Add the wings */
+            for (j = 1; j < WING_LENGTH + 1; j++)
+                {
+                gameBoard[position.row - 1][position.column - j].symbol = PLANE;
+                gameBoard[position.row - 1][position.column + j].symbol = PLANE;
+                }
+            /* Add the tail */
+            gameBoard[position.row - PLANE_LENGTH + 1][position.column + 1].symbol = PLANE;
+            gameBoard[position.row - PLANE_LENGTH + 1][position.column - 1].symbol = PLANE;
+            break;
+        case WEST:
+            /* Add the body */
+            for (j = 0; j < PLANE_LENGTH; j++)
+                {
+                gameBoard[position.row][position.column + j].symbol = PLANE;
+                }
+            /* Add the wings */
+            for (j = 1; j < WING_LENGTH + 1; j++)
+                {
+                gameBoard[position.row - j][position.column + 1].symbol = PLANE;
+                gameBoard[position.row + j][position.column + 1].symbol = PLANE;
+                }
+            /* Add the tail */
+            gameBoard[position.row - 1][position.column + PLANE_LENGTH - 1].symbol = PLANE;
+            gameBoard[position.row + 1][position.column + PLANE_LENGTH - 1].symbol = PLANE;
+            break;
+        case EAST:
+            /* Add the body */
+            for (j = 0; j < PLANE_LENGTH; j++)
+                {
+                gameBoard[position.row][position.column - j].symbol = PLANE;
+                }
+            /* Add the wings */
+            for (j = 1; j < WING_LENGTH + 1; j++)
+                {
+                gameBoard[position.row - j][position.column - 1].symbol = PLANE;
+                gameBoard[position.row + j][position.column - 1].symbol = PLANE;
+                }
+            /* Add the tail */
+            gameBoard[position.row - 1][position.column - PLANE_LENGTH + 1].symbol = PLANE;
+            gameBoard[position.row + 1][position.column - PLANE_LENGTH + 1].symbol = PLANE;
+            break;
+        }
 }
 
 /**
@@ -126,55 +186,103 @@ void putShipOnGameBoard (Cell gameBoard[][COLS], WaterCraft ship,
  *                 if input is correctly inputted
  * Post-condition: Ships placed on game board
  */
-void manuallyPlaceShipsOnGameBoard (Cell gameBoard[][COLS], WaterCraft ship[]) {
-    char       stringPosition[11] = "";
-    int        i = 0, j = 0;
-
-    Coordinate position[5];
-    Boolean    isValid = FALSE;
+void manuallyPlaceShipsOnGameBoard (Cell gameBoard[ROWS][COLS], AirCraft ship[])
+{
+    char        stringPosition[10] = "";
+    int         i = 0, j = 0;
+    int         direction_of_flight;
+    Coordinate  position;
+    Boolean     isValid = FALSE;
 
     fflush (stdin);
 
-    for (i = 0; i < NUM_OF_SHIPS; i++) {
-
-        while (TRUE) {
+    for (i = 0; i < NUM_OF_PLANES; i++)
+        {
+        while (TRUE)
+            {
             system ("cls");
             printGameBoard (gameBoard, TRUE);
-            printf ("> Please enter the %d cells to place the %s across (no spaces):\n", ship[i].length, ship[i].name);
+            printf ("> Please enter the x-y coordinates of the head of the plane and direction of flight(1-south, 2-west, 3-north, 4-east):\n" );
             printf ("> ");
-            scanf_s ("%s", stringPosition);
+            scanf_s ("%s", stringPosition, (unsigned)_countof(stringPosition));
 
-            /* convertStringtoPosition returns false if unsuccessful */
-            if (convertStringtoPosition (position, stringPosition, ship[i].length)) {
-
-                isValid = TRUE;
-
-                for (j = 0; j < ship[i].length; j++) {
-
-                    if (gameBoard[position[j].row][position[j].column].symbol == WATER) {
-                        gameBoard[position[j].row][position[j].column].symbol = ship[i].symbol;
-                    } else {
-                        isValid = FALSE;
-                        printf ("> Invalid input!\n");
-
-                        if (j != 0)
-                            while (j >= 0) {
-                                gameBoard[position[j].row][position[j].column].symbol = WATER;
-                                j--;
+            /* Check if valid string and position */
+            isValid = ( convertStringtoPosition (&position, stringPosition, &direction_of_flight)
+                     && isValidLocation(gameBoard, position, direction_of_flight) );
+            if (isValid)
+                {
+                switch (direction_of_flight)
+                    {
+                    case NORTH:
+                        /* Add the body */
+                        for (j = 0; j < PLANE_LENGTH; j++)
+                            {
+                            gameBoard[position.row + j][position.column].symbol = PLANE;
                             }
-
+                        /* Add the wings */
+                        for (j = 1; j < WING_LENGTH + 1; j++)
+                            {
+                            gameBoard[position.row + 1][position.column - j].symbol = PLANE;
+                            gameBoard[position.row + 1][position.column + j].symbol = PLANE;
+                            }
+                        /* Add the tail */
+                        gameBoard[position.row + PLANE_LENGTH - 1][position.column + 1].symbol = PLANE;
+                        gameBoard[position.row + PLANE_LENGTH - 1][position.column - 1].symbol = PLANE;
+                        break;
+                    case SOUTH:
+                        /* Add the body */
+                        for (j = 0; j < PLANE_LENGTH; j++)
+                            {
+                            gameBoard[position.row - j][position.column].symbol = PLANE;
+                            }
+                        /* Add the wings */
+                        for (j = 1; j < WING_LENGTH + 1; j++)
+                            {
+                            gameBoard[position.row - 1][position.column - j].symbol = PLANE;
+                            gameBoard[position.row - 1][position.column + j].symbol = PLANE;
+                            }
+                        /* Add the tail */
+                        gameBoard[position.row - PLANE_LENGTH + 1][position.column + 1].symbol = PLANE;
+                        gameBoard[position.row - PLANE_LENGTH + 1][position.column - 1].symbol = PLANE;
+                        break;
+                    case WEST:
+                        /* Add the body */
+                        for (j = 0; j < PLANE_LENGTH; j++)
+                            {
+                            gameBoard[position.row][position.column + j].symbol = PLANE;
+                            }
+                        /* Add the wings */
+                        for (j = 1; j < WING_LENGTH + 1; j++)
+                            {
+                            gameBoard[position.row - j][position.column + 1].symbol = PLANE;
+                            gameBoard[position.row + j][position.column + 1].symbol = PLANE;
+                            }
+                        /* Add the tail */
+                        gameBoard[position.row - 1][position.column + PLANE_LENGTH - 1].symbol = PLANE;
+                        gameBoard[position.row + 1][position.column + PLANE_LENGTH - 1].symbol = PLANE;
+                        break;
+                    case EAST:
+                        /* Add the body */
+                        for (j = 0; j < PLANE_LENGTH; j++)
+                            {
+                            gameBoard[position.row][position.column - j].symbol = PLANE;
+                            }
+                        /* Add the wings */
+                        for (j = 1; j < WING_LENGTH + 1; j++)
+                            {
+                            gameBoard[position.row - j][position.column - 1].symbol = PLANE;
+                            gameBoard[position.row + j][position.column - 1].symbol = PLANE;
+                            }
+                        /* Add the tail */
+                        gameBoard[position.row - 1][position.column - PLANE_LENGTH + 1].symbol = PLANE;
+                        gameBoard[position.row + 1][position.column - PLANE_LENGTH + 1].symbol = PLANE;
                         break;
                     }
                 }
-            } else {
-                isValid = FALSE;
-                printf ("> Invalid input!\n");
+            if (isValid == TRUE)
+                break;
             }
-
-            if (isValid == TRUE) break;
         }
-
-    }
 }
 
 /**
@@ -186,21 +294,25 @@ void manuallyPlaceShipsOnGameBoard (Cell gameBoard[][COLS], WaterCraft ship[]) {
  * Pre-condition : n/a
  * Post-condition: Ships placed on game board
  */
-void randomlyPlaceShipsOnGameBoard (Cell gameBoard[][COLS], WaterCraft ship[]) {
+void randomlyPlaceShipsOnGameBoard (Cell gameBoard[][COLS], AirCraft ship[]) {
     Coordinate position;
-    int direction = -1;
+    int direction_of_flight = -1;
     int i = 0;
 
-    for (i = 0; i < NUM_OF_SHIPS; i++) {
-        while (TRUE) {
-            direction = getRandomNumber (0, 1); /* 0 -> horizontal, 1 -> vertical */
-            position = generatePosition (direction, ship[i].length);
+    for (i = 0; i < NUM_OF_PLANES; i++)
+        {
+        while (TRUE)
+            {
+            direction_of_flight = getRandomNumber (1, 3); /*  1 -> SOUTH
+                                                              2 -> WEST
+                                                              3 -> NORTH
+                                                              4 -> EAST */
+            position = generatePosition (direction_of_flight);
 
-            if (isValidLocation (gameBoard, position, direction, ship[i].length)) break;
+            if (isValidLocation (gameBoard, position, direction_of_flight)) break;
+            }
+        putShipOnGameBoard (gameBoard, position, direction_of_flight);
         }
-
-        putShipOnGameBoard (gameBoard, ship[i], position, direction);
-    }
 }
 
 /**
@@ -215,16 +327,12 @@ void randomlyPlaceShipsOnGameBoard (Cell gameBoard[][COLS], WaterCraft ship[]) {
 void updateGameBoard (Cell gameBoard[][COLS], Coordinate target) {
     switch (gameBoard[target.row][target.column].symbol) {
         /* miss */
-        case WATER:
+        case AIR:
             gameBoard[target.row][target.column].symbol = MISS;
             break;
 
         /* hit */
-        case CARRIER:
-        case BATTLESHIP:
-        case CRUISER:
-        case SUBMARINE:
-        case DESTROYER:
+        case PLANE:
             gameBoard[target.row][target.column].symbol = HIT;
             break;
 
@@ -304,96 +412,148 @@ void systemMessage (char *message) {
  * Pre-condition : stream to output file was created
  * Post-condition: n/a
  */
-Boolean checkSunkShip (short sunkShip[][NUM_OF_SHIPS], short player, char shipSymbol, FILE *stream) {
-    Boolean sunked = FALSE;
+Boolean checkSunkShip (short sunkPlane[][NUM_OF_PLANES], short player, char shipSymbol, FILE *stream) {
+    Boolean shot_down = FALSE;
 
     switch (shipSymbol) {
-        case CARRIER:
-            if (--sunkShip[player][0] == 0) {
-                printf ("> Player %d's Carrier sunked!\n", player + 1);
+        case PLANE:
+            if (--sunkPlane[player][0] == 0) {
+                printf ("> Player %d's Plane shot down!\n", player + 1);
 
                 /* Write to battleship.log */
-                fprintf (stream, "Player %d's Carrier sunked!\n", player + 1);
+                fprintf (stream, "Player %d's Plane shot down!\n", player + 1);
 
-                sunked = TRUE;
+                shot_down = TRUE;
             }
             break;
-
-        case BATTLESHIP:
-            if (--sunkShip[player][1] == 0) {
-                printf ("> Player %d's Battleship sunked!\n", player + 1);
-
-                /* Write to battleship.log */
-                fprintf (stream, "Player %d's Battleship sunked!\n", player + 1);
-
-                sunked = TRUE;
-            }
-            break;
-
-        case CRUISER:
-            if (--sunkShip[player][2] == 0) {
-                printf ("> Player %d's Cruiser sunked!\n", player + 1);
-
-                /* Write to battleship.log */
-                fprintf (stream, "Player %d's Cruiser sunked!\n", player + 1);
-
-                sunked = TRUE;
-            }
-            break;
-
-        case SUBMARINE:
-            if (--sunkShip[player][3] == 0) {
-                printf ("> Player %d's Submarine sunked!\n", player + 1);
-
-                /* Write to battleship.log */
-                fprintf (stream, "Player %d's Submarine sunked!\n", player + 1);
-
-                sunked = TRUE;
-            }
-            break;
-
-        case DESTROYER:
-            if (--sunkShip[player][4] == 0) {
-                printf ("> Player %d's Destroyer sunked!\n", player + 1);
-
-                /* Write to battleship.log */
-                fprintf (stream, "Player %d's Destroyer sunked!\n", player + 1);
-
-                sunked = TRUE;
-            }
-            break;
+        default:
+                break;
     }
 
-    return sunked;
+    return shot_down;
 }
 
 /**
  * Function name : isValidLocation ()
- * Date Created  : 17 October 2012
- * Usage         : isValidLocation (Cell [][], Coordinate, int, int);
+ * Usage         : isValidLocation (Cell [][], Coordinate, int);
  * Definition    : This function checks if specified position, direction and
  *                 length is valid on location specified on the game board
  * Pre-condition : n/a
  * Post-condition: n/a
  */
-Boolean isValidLocation (Cell gameBoard[][COLS], Coordinate position,
-                         int direction, int length) {
-    int i = length - 1;
-    Boolean isValid = TRUE;
+Boolean isValidLocation (Cell gameBoard[ROWS][COLS], Coordinate position,
+                         int direction_of_flight) {
+    int i;
+    Boolean lengthOK = TRUE;
+    Boolean wingsOK  = TRUE;
+    Boolean tailOK   = TRUE;
 
-    for (i = 0; isValid && i < length; i++) {
-        if (direction == HORIZONTAL) {
-            if (gameBoard [position.row][position.column + i].symbol != WATER &&
-                (position.column + i) < COLS)
-                isValid = FALSE;
-        } else { /* VERTICAL */
-            if (gameBoard [position.row + i][position.column].symbol != WATER &&
-                (position.row + i) < ROWS)
-                isValid = FALSE;
+    switch (direction_of_flight)
+        {
+        case NORTH:
+            for (i = 0; lengthOK && i < PLANE_LENGTH; i++)
+                {
+                if ((position.row + i) >= ROWS
+                 || gameBoard[position.row + i][position.column].symbol != AIR)
+                    {
+                    lengthOK = FALSE;
+                    }
+                }
+
+            for (i = 1; wingsOK && i < WING_LENGTH + 1; i++)
+                {
+                if (((position.column - i < 0) || (position.column + i >= COLS))
+                 || gameBoard[position.row + 1][position.column - i].symbol != AIR
+                 || gameBoard[position.row + 1][position.column + i].symbol != AIR)
+                    {
+                    wingsOK = FALSE;
+                    }
+                }
+            if (gameBoard[position.row + PLANE_LENGTH - 1][position.column - 1].symbol != AIR
+             || gameBoard[position.row + PLANE_LENGTH - 1][position.column + 1].symbol != AIR)
+                {
+                tailOK = FALSE;
+                }
+            break;
+        case SOUTH:
+            for (i = 0; lengthOK && i < PLANE_LENGTH; i++)
+                {
+                if ((position.row - i) < 0
+                || gameBoard[position.row - i][position.column].symbol != AIR )
+                    {
+                    lengthOK = FALSE;
+                    }
+                }
+            for (i = 1; wingsOK && i < WING_LENGTH + 1; i++)
+                {
+                if (((position.column - i < 0) || (position.column + i >= COLS))
+                 || gameBoard[position.row - 1][position.column - i].symbol != AIR
+                 || gameBoard[position.row - 1][position.column + i].symbol != AIR)
+                    {
+                    wingsOK = FALSE;
+                    }
+                }
+            if (gameBoard[position.row - PLANE_LENGTH + 1][position.column - 1].symbol != AIR
+             || gameBoard[position.row - PLANE_LENGTH + 1][position.column + 1].symbol != AIR)
+                {
+                tailOK = FALSE;
+                }
+            break;
+        case WEST:
+            for (i = 0; lengthOK && i < PLANE_LENGTH; i++)
+                {
+                if ((position.column + i) >= COLS
+                 || gameBoard[position.row][position.column + i].symbol != AIR )
+                    {
+                    lengthOK = FALSE;
+                    }
+                }
+            for (i = 1; wingsOK && i < WING_LENGTH + 1; i++)
+                {
+                if (((position.row - i < 0) || (position.row + i >= ROWS))
+                 || gameBoard[position.row - i][position.column + 1].symbol != AIR
+                 || gameBoard[position.row + i][position.column + 1].symbol != AIR)
+                    {
+                    wingsOK = FALSE;
+                    }
+                }
+            if (gameBoard[position.row - 1][position.column + PLANE_LENGTH - 1].symbol != AIR
+             || gameBoard[position.row + 1][position.column + PLANE_LENGTH - 1].symbol != AIR)
+                {
+                tailOK = FALSE;
+                }
+            break;
+        case EAST:
+            for (i = 0; lengthOK && i < PLANE_LENGTH; i++)
+                {
+                if ((position.column - i) < 0
+                 || gameBoard[position.row][position.column - i].symbol != AIR )
+                    {
+                    lengthOK = FALSE;
+                    }
+                }
+            for (i = 1; wingsOK && i < WING_LENGTH + 1; i++)
+                {
+                if (((position.row - i < 0) || (position.row + i >= ROWS))
+                 || gameBoard[position.row - i][position.column - 1].symbol != AIR
+                 || gameBoard[position.row + i][position.column - 1].symbol != AIR )
+                    {
+                    wingsOK = FALSE;
+                    }
+                }
+            if (gameBoard[position.row - 1][position.column - PLANE_LENGTH + 1].symbol != AIR
+             || gameBoard[position.row + 1][position.column - PLANE_LENGTH + 1].symbol != AIR)
+                {
+                tailOK = FALSE;
+                }
+            break;
+        default:
+            lengthOK = FALSE;
+            wingsOK = FALSE;
+            tailOK = FALSE;
         }
-    }
 
-    return isValid;
+    return (lengthOK && wingsOK && tailOK);
 }
 
 /**
@@ -406,29 +566,32 @@ Boolean isValidLocation (Cell gameBoard[][COLS], Coordinate position,
  *                 does not check for inccorrect coordinates
  * Post-condition: n/a
  */
-Boolean convertStringtoPosition (Coordinate position[], char *stringPosition, int length) {
+Boolean convertStringtoPosition (Coordinate *position, char *stringPosition, int *direction_of_flight)
+{
     Boolean flag = TRUE;
-    char temp = '\0';
-    int i = 0, j = 0, k = 1;
+    int     i;
 
     /* checks if length of input is good */
-    if (strlen (stringPosition)/2 == length) {
-        /* loops through the length of the ship */
-        for (i = 0; i < length && flag; i++) {
-            /* checks if each cell is a digit */
-            if (isdigit (stringPosition[j]) && isdigit (stringPosition[k])) {
-                position[i].row    = stringPosition[j] - '0';
-                position[i].column = stringPosition[k] - '0';
-
-                j += 2;
-                k += 2;
-            } else {
-                flag = FALSE;
+    if( strlen (stringPosition) == 3 )
+        {
+        /* checks if each cell is a digit for each plane */
+        if( isdigit(stringPosition[0])
+         && isdigit(stringPosition[1])
+         && isdigit(stringPosition[2]) )
+            {
+            position->row        = stringPosition[0] - '0';
+            position->column     = stringPosition[1] - '0';
+            *direction_of_flight = stringPosition[2] - '0';
+            }
+        else
+            {
+            flag = FALSE;
             }
         }
-    } else {
+    else
+        {
         flag = FALSE;
-    }
+        }
 
     return flag;
 }
@@ -453,24 +616,40 @@ Boolean isWinner (Stats players[], int player) {
 
 /**
  * Function name : generatePosition ()
- * Date Created  : 17 October 2012
- * Usage         : generatePosition (int, int);
+ * Usage         : generatePosition (int);
  * Definition    : This function generates position based on the
- *                 direction and length specified and it can't be
- *                 more than the game board size
+ *                 direction of flight and it can't be more than
+ *                 the game board size
  * Pre-condition : n/a
  * Post-condition: n/a
  */
-Coordinate generatePosition (int direction, int length) {
+Coordinate generatePosition (int direction_of_flight)
+{
     Coordinate position;
 
-    if (direction == HORIZONTAL) {
-        position.row    = getRandomNumber (0, ROWS);
-        position.column = getRandomNumber (0, COLS - length);
-    } else { /* VERTICAL */
-        position.row    = getRandomNumber (0, ROWS - length);
-        position.column = getRandomNumber (0, COLS);
-    }
+    switch (direction_of_flight)
+        {
+        case NORTH:
+            position.row    = getRandomNumber( 0, ROWS - PLANE_LENGTH );
+            position.column = getRandomNumber( WING_LENGTH, COLS - WING_LENGTH - 1 );
+            break;
+        case SOUTH:
+            position.row    = getRandomNumber( PLANE_LENGTH - 1, ROWS - 1 );
+            position.column = getRandomNumber( WING_LENGTH, COLS - WING_LENGTH - 1 );
+            break;
+        case WEST:
+            position.row    = getRandomNumber( WING_LENGTH, ROWS - WING_LENGTH - 1 );
+            position.column = getRandomNumber( 0, COLS - PLANE_LENGTH );
+            break;
+        case EAST:
+            position.row    = getRandomNumber( WING_LENGTH, ROWS - WING_LENGTH - 1 );
+            position.column = getRandomNumber( PLANE_LENGTH - 1, COLS - 1 );
+            break;
+        default:
+            position.row    = 0;
+            position.column = 0;
+            break;
+        }
 
     return position;
 }
@@ -510,16 +689,12 @@ short checkShot (Cell gameBoard[][COLS], Coordinate target) {
 
     switch (gameBoard[target.row][target.column].symbol) {
         /* miss */
-        case WATER:
+        case AIR:
             hit = 0;
             break;
 
         /* hit */
-        case CARRIER:
-        case BATTLESHIP:
-        case CRUISER:
-        case SUBMARINE:
-        case DESTROYER:
+        case PLANE:
             hit = 1;
             break;
 
@@ -547,5 +722,5 @@ int getRandomNumber (int lowest, int highest) {
         return rand () % ++highest;
 
     if (lowest > 0)
-        return rand () % ++highest + lowest;
+        return rand () % highest + lowest;
 }
