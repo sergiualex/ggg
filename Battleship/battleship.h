@@ -36,9 +36,9 @@
 #define PLAYER_TWO    1
 
 
-#define AIR           ' '
-#define HIT           '*'
-#define MISS          'X'
+#define AIR           '?'
+#define HIT           'x'
+#define MISS          ' '
 
 #define PLANE         'p'
 
@@ -92,6 +92,7 @@ void         randomlyPlaceShipsOnGameBoard  (Cell gameBoard[][COLS], AirCraft sh
 void         updateGameBoard                (Cell gameBoard[][COLS], Coordinate target);
 void         checkBoundsOfCardinal          (Boolean cardinals[], int bound, int direction);
 void         systemMessage                  (char *message);
+void         huntCoordinates                (Coordinate *target);
 
 Boolean      checkSunkShip                  (short sunkShip[][NUM_OF_PLANES], short player, char shipSymbol, FILE *stream);
 Boolean      isValidLocation                (Cell gameBoard[][COLS], Coordinate position, int direction);

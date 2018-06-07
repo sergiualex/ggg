@@ -569,7 +569,6 @@ Boolean isValidLocation (Cell gameBoard[ROWS][COLS], Coordinate position,
 Boolean convertStringtoPosition (Coordinate *position, char *stringPosition, int *direction_of_flight)
 {
     Boolean flag = TRUE;
-    int     i;
 
     /* checks if length of input is good */
     if( strlen (stringPosition) == 3 )
@@ -723,4 +722,13 @@ int getRandomNumber (int lowest, int highest) {
 
     if (lowest > 0)
         return rand () % highest + lowest;
+}
+
+void huntCoordinates(Coordinate *target)
+{
+    do
+        {
+        target->row = getRandomNumber(1, ROWS - 1);
+        target->column = getRandomNumber(1, COLS - 1);
+        } while ( (target->row + target->column) % 2 == 0 );
 }
