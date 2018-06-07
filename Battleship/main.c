@@ -25,13 +25,19 @@ int main (void)
 {
     int state = 0;
     Cell adversaryGameBoard[ROWS][COLS];       /* Adversary game board */
-    Coordinate target;
-    Boolean my_turn = FALSE;                        /*is it my turn or not?*/
+    Coordinate target;             /* x, y value of a target */
+    Coordinate targetTemp;         /* x, y value that holds a temporary value*/
+    Coordinate targetOrigin;       /* x, y value of the original target */
+    Coordinate targetAI;           /* x, y value of the targets using AI technique */
+
+    Boolean my_turn = FALSE;                     /*is it my turn or not?*/
+    Boolean huntMode = TRUE;                     /* mode of randomly selecting a target */
+    Boolean targetMode     = FALSE;              /* mode when there is a hit */
+    Boolean hit = FALSE;   /* target was hit or miss*/
+    short shot    = 0;             /* holds temp value if ship has been shot */
 
     printf ("Welcome to best battleplanes app ever!\n");
     systemMessage("Hit <ENTER> to connect to the server and start the game!\n");
-
-    get_bot_ID();
 
     initializeGameBoard(adversaryGameBoard);
 
@@ -47,14 +53,39 @@ int main (void)
             case 2:
                 break;
             case 3:
-                send_board();
+                set_board();
             case 4:
+
                 if (my_turn)
                     {
-                    take_shot(target);
+                    if (huntMode)
+                        {
+                        do
+                            {
+                            huntCoordinates(&target);
+                            shot = checkShot(adversaryGameBoard, target);
+
+                            } while (shot == -1);
+
+                        }
+                    if (targetMode)
+                        {
+                        do
+                            {
+                            calculateNextShot(&target);
+                            shot = checkShot(adversaryGameBoard, target);
+
+                            } while (shot == -1);
+                        }
+
+                    take_shot(target.row, target.column);
+                    if (hit)
+                        adversaryGameBoard[target.row][target.column].symbol == HIT;
+                    else
+                        adversaryGameBoard[target.row][target.column].symbol == MISS;
                     }
             }
-
+        sleep(1);   /*wait 1 second*/
         } while ( state <= 4)
 
     ///**

@@ -93,6 +93,7 @@ void         updateGameBoard                (Cell gameBoard[][COLS], Coordinate 
 void         checkBoundsOfCardinal          (Boolean cardinals[], int bound, int direction);
 void         systemMessage                  (char *message);
 void         huntCoordinates                (Coordinate *target);
+void         calculateNextShot              (Coordinate *target);
 
 Boolean      checkSunkShip                  (short sunkShip[][NUM_OF_PLANES], short player, char shipSymbol, FILE *stream);
 Boolean      isValidLocation                (Cell gameBoard[][COLS], Coordinate position, int direction);

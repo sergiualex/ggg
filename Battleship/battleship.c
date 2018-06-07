@@ -732,3 +732,8 @@ void huntCoordinates(Coordinate *target)
         target->column = getRandomNumber(1, COLS - 1);
         } while ( (target->row + target->column) % 2 == 0 );
 }
+
+void calculateNextShot(Coordinate *target)
+{
+
+}
