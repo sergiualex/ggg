@@ -10,8 +10,6 @@
                           LITERAL CONSTANTS
 --------------------------------------------------------------------*/
 
-#define HOST = "tbd.com"
-
 /*--------------------------------------------------------------------
                                 TYPES
 --------------------------------------------------------------------*/
@@ -51,9 +49,15 @@ void get_bot_ID
     void
     );
 
-void error
+void set_board
     (
-    const char *msg
+    void
+    );
+
+void take_shot
+    (
+    int x,
+    int y
     );
 
 #endif /* _WEBSERVICE_H */

@@ -58,7 +58,7 @@
 *       get_bot_ID
 *
 *   DESCRIPTION:
-*       Makes a GET request at to_be_revealed_later.php
+*       Makes a GET request to the server to get the bot ID
 *
 *********************************************************************/
 void get_bot_ID
@@ -73,13 +73,14 @@ CALL( WSAStartup(MAKEWORD(2,2), &wsa) == 0 );
 
 struct servent *sent;
 CALL( (sent = getservbyname("http", "tcp")) != NULL );
-int port = sent -> s_port;
+//int port = sent -> s_port;
+int port = 25335;
 
 struct protoent *pent;
 CALL( (pent = getprotobyname("tcp")) != NULL );
 
 struct hostent *hent;
-char * host = "google.com";
+char * host = "172.17.53.251";
 CALL( (hent = gethostbyname(host)) != NULL);
 printf("%s -> %s\n", hent->h_name, inet_ntoa(*((struct in_addr *)hent->h_addr)));
 
@@ -107,4 +108,64 @@ while(readin > 0) {
 
 closesocket(sock);
 
-}
+}  /* get_bot_ID */
+
+
+/*********************************************************************
+*
+*   PROCEDURE NAME:
+*       take_shot
+*
+*   DESCRIPTION:
+*       Makes a POST request to the server to take a shot
+*
+*********************************************************************/
+void take_shot
+    (
+    int x,
+    int y
+    )
+{
+char * message_fmt = "POST /{%d: int, %d: int} HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n";
+
+WSADATA wsa;
+CALL( WSAStartup(MAKEWORD(2,2), &wsa) == 0 );
+
+struct servent *sent;
+CALL( (sent = getservbyname("http", "tcp")) != NULL );
+//int port = sent -> s_port;
+int port = 25335;
+
+struct protoent *pent;
+CALL( (pent = getprotobyname("tcp")) != NULL );
+
+struct hostent *hent;
+char * host = "172.17.53.251";
+CALL( (hent = gethostbyname(host)) != NULL);
+printf("%s -> %s\n", hent->h_name, inet_ntoa(*((struct in_addr *)hent->h_addr)));
+
+struct sockaddr_in addr;
+addr.sin_family = AF_INET;
+addr.sin_port = port;
+addr.sin_addr = *((struct in_addr *) hent->h_addr);
+memset(addr.sin_zero, 0, 8);
+
+int sock;
+CALL( (sock = socket(AF_INET, SOCK_STREAM, pent->p_proto)) > 0 );
+
+CALL( (connect(sock, (struct sockaddr *)&addr, sizeof(struct sockaddr))) == 0 );
+
+char buff[1024+1];
+sprintf(buff, message_fmt, x, y, host);
+CALL ( send(sock, buff, strlen(buff), 0) == strlen(buff) );
+
+int readin = recv(sock, buff, sizeof(buff) - 1, 0);
+while(readin > 0) {
+    buff[readin] = '\0';
+    printf("%s", buff);
+    readin = recv(sock, buff, sizeof(buff) - 1, 0);
+    }
+
+closesocket(sock);
+
+} /* take_shot */
