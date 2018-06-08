@@ -735,78 +735,89 @@ void huntCoordinates(Coordinate *target)
         } while ( (target->row + target->column) % 2 == 0 );
 }
 
-void calculateNextShot(Cell gameBoard[][COLS], Coordinate *target)
+void calculateNextShot(Cell gameBoard[][COLS], Coordinate *nextTarget, Coordinate originalTarget)
 {
-    //Boolean    cardinals[4] = { TRUE, TRUE, TRUE, TRUE }; /* represents the 4 cardinals, N, S, W, E */
-    //int   north   = 0,             /* holds change of value when going north */
-    //      south   = 0,             /* holds change of value when going south */
-    //      east    = 0,             /* holds change of value when going east */
-    //      west    = 0;             /* holds change of value when going west */
-    //do {
-    //    if (cardinals[NORTH]) {        /* NORTH */
-    //        target.row = north;
-    //    } else if (cardinals[SOUTH]) { /* SOUTH */
-    //        target.row = south;
-    //    } else if (cardinals[WEST]) {  /* WEST */
-    //        target.column = west;
-    //    } else if (cardinals[EAST]) {  /* EAST */
-    //        target.column = east;
-    //    } else if (!cardinals[NORTH] && !cardinals[SOUTH] &&
-    //                !cardinals[WEST]  && !cardinals[EAST]  &&
-    //                !wasAPlaneDestroyed) {
-    //        /* All cardinals are FALSE but has not sunk a ship */
+    short shot    = 0;             /* holds temp value if ship has been shot */
+    Coordinate targetTemp;         /* x, y value that holds a temporary value*/
+//    Coordinate targetOrigin;       /* x, y value of the original target */
+    Boolean wasAPlaneDestroyed = FALSE;
+    Boolean    cardinals[4] = { TRUE, TRUE, TRUE, TRUE }; /* represents the 4 cardinals, N, S, W, E */
+    int   north   = 0,             /* holds change of value when going north */
+          south   = 0,             /* holds change of value when going south */
+          east    = 0,             /* holds change of value when going east */
+          west    = 0;             /* holds change of value when going west */
+    int   i       = 0,
+          counter = 1;             /* i and counter are used as counters */
 
-    //        /* reinitiliazes target to the original target value */
-    //        target = targetOrigin;
-    //        targetTemp = target;
 
-    //        /**
-    //            * Counter increments by one, when the loop cycles again and
-    //            * all cardinals are still FALSE. This ensures that we are checking
-    //            * one cell over the adjacent cells
-    //            */
-    //        north = target.row - counter;
-    //        targetTemp.row = north;
+    do {
+        if (cardinals[NORTH]) {        /* NORTH */
+            nextTarget->row = north;
+        } else if (cardinals[SOUTH]) { /* SOUTH */
+            nextTarget->row = south;
+        } else if (cardinals[WEST]) {  /* WEST */
+            nextTarget->column = west;
+        } else if (cardinals[EAST]) {  /* EAST */
+            nextTarget->column = east;
+        } else if (!cardinals[NORTH] && !cardinals[SOUTH] &&
+                    !cardinals[WEST]  && !cardinals[EAST]  &&
+                    !wasAPlaneDestroyed)
+            {
+            /* All cardinals are FALSE but has not destroyed a plane */
 
-    //        /* checks if the value NORTH of the target is a hit or miss */
-    //        if (checkShot (playerOneGameBoard, targetTemp) != -1 && north >= 0) {
-    //            cardinals[NORTH] = TRUE;
-    //        }
+            /* reinitializes target to the original target value */
+            *nextTarget = originalTarget;
+            targetTemp = *nextTarget;
 
-    //        targetTemp = target;
-    //        south = target.row + counter;
-    //        targetTemp.row = south;
+            /**
+                * Counter increments by one, when the loop cycles again and
+                * all cardinals are still FALSE. This ensures that we are checking
+                * one cell over the adjacent cells
+                */
+            north = nextTarget->row - counter;
+            targetTemp.row = north;
 
-    //        /* checks if the value SOUTH of the target is a hit or miss */
-    //        if (checkShot (playerOneGameBoard, targetTemp) != -1 && south <= 9) {
-    //            cardinals[SOUTH] = TRUE;
-    //        }
+            /* checks if the value NORTH of the target is a hit or miss */
+            if (checkShot(gameBoard, targetTemp) != -1 && north >= 0) {
+                cardinals[NORTH] = TRUE;
+            }
 
-    //        targetTemp = target;
-    //        west = target.column - counter;
-    //        targetTemp.column = west;
+            targetTemp = *nextTarget;
+            south = nextTarget->row + counter;
+            targetTemp.row = south;
 
-    //        /* checks if the value WEST of the target is a hit or miss */
-    //        if (checkShot (playerOneGameBoard, targetTemp) != -1 && west >= 0) {
-    //            cardinals[WEST] = TRUE;
-    //        }
+            /* checks if the value SOUTH of the target is a hit or miss */
+            if (checkShot(gameBoard, targetTemp) != -1 && south <= 9) {
+                cardinals[SOUTH] = TRUE;
+            }
 
-    //        targetTemp = target;
-    //        east = target.column + counter;
-    //        targetTemp.column = east;
+            targetTemp = *nextTarget;
+            west = nextTarget->column - counter;
+            targetTemp.column = west;
 
-    //        /* checks if the value EAST of the target is a hit or miss */
-    //        if (checkShot (playerOneGameBoard, targetTemp) != -1 && east <= 9) {
-    //            cardinals[EAST] = TRUE;
-    //        }
+            /* checks if the value WEST of the target is a hit or miss */
+            if (checkShot(gameBoard, targetTemp) != -1 && west >= 0) {
+                cardinals[WEST] = TRUE;
+            }
 
-    //        /**
-    //            * increments counter every cycle, serves as a addend to how
-    //            * many cells to check from the target cell
-    //            */
-    //        counter++;
+            targetTemp = *nextTarget;
+            east = nextTarget->column + counter;
+            targetTemp.column = east;
 
-    //    }
+            /* checks if the value EAST of the target is a hit or miss */
+            if (checkShot(gameBoard, targetTemp) != -1 && east <= 9) {
+                cardinals[EAST] = TRUE;
+            }
+
+            /**
+                * increments counter every cycle, serves as a addend to how
+                * many cells to check from the target cell
+                */
+            counter++;
+            /* checks if the shot is a hit or miss */
+            shot = checkShot(gameBoard, *nextTarget);
+        }
+    } while (shot == -1);
 }
 
 Boolean checkIfShotDown()

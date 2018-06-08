@@ -32,7 +32,7 @@ int main (void)
     Cell adversaryGameBoard[ROWS][COLS];       /* Adversary game board */
     Coordinate target;             /* x, y value of a target */
     //Coordinate targetTemp;         /* x, y value that holds a temporary value*/
-    //Coordinate targetOrigin;       /* x, y value of the original target */
+    Coordinate originalTarget;       /* x, y value of the original target */
     //Coordinate targetAI;           /* x, y value of the targets using AI technique */
 
     int yourTurn = 0;                     /*is it my turn or not?*/
@@ -98,7 +98,7 @@ int main (void)
                             {
                             huntCoordinates(&target);
                             shot = checkShot(adversaryGameBoard, target);
-
+                            originalTarget = target;
                             } while (shot == -1);
 
                         }
@@ -106,7 +106,7 @@ int main (void)
                         {
                         do
                             {
-                            calculateNextShot(adversaryGameBoard, &target);
+                            calculateNextShot(adversaryGameBoard, &target, originalTarget);
                             shot = checkShot(adversaryGameBoard, target);
 
                             } while (shot == -1);
@@ -119,8 +119,8 @@ int main (void)
                     if (hit == 1)
                     {
                         adversaryGameBoard[target.row][target.column].symbol = HIT;
-                        targetMode = TRUE;
-                        huntMode = FALSE;
+                        //targetMode = TRUE;
+                        //huntMode = FALSE;
                     }
                     else
                         adversaryGameBoard[target.row][target.column].symbol = MISS;
